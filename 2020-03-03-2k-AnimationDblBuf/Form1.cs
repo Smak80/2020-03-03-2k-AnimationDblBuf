@@ -30,5 +30,10 @@ namespace _2020_03_03_2k_AnimationDblBuf
                 mainPanel.ClientRectangle
             );
         }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            a.Stop();
+        }
     }
 }

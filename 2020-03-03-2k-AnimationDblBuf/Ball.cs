@@ -21,6 +21,12 @@ namespace _2020_03_03_2k_AnimationDblBuf
         private int dx, dy;
         private Thread t = null;
         private bool stop = false;
+        private int counter = 0;
+        private static int maxCount = 10;
+        public bool IsAlive
+        {
+            get { return t!=null && t.IsAlive; }
+        }
 
         public Ball(Rectangle r)
         {
@@ -54,7 +60,7 @@ namespace _2020_03_03_2k_AnimationDblBuf
 
         private void Move()
         {
-            while (!stop)
+            while (!stop && counter<maxCount)
             {
                 Thread.Sleep(30);
                 X += dx;
@@ -66,6 +72,7 @@ namespace _2020_03_03_2k_AnimationDblBuf
                         X = width - BallD;
                     }
                     dx = -dx;
+                    counter++;
                 }
 
                 if (Y > height - BallD || Y < 0)
@@ -75,6 +82,7 @@ namespace _2020_03_03_2k_AnimationDblBuf
                         Y = height - BallD;
                     }
                     dy = -dy;
+                    counter++;
                 }
             }
         }

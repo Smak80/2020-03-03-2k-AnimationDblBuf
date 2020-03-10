@@ -53,6 +53,7 @@
             this.Controls.Add(this.mainPanel);
             this.Name = "Form1";
             this.Text = "Анимашка";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
 
         }

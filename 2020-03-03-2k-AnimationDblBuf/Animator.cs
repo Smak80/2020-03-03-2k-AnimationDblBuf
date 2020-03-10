@@ -13,6 +13,7 @@ namespace _2020_03_03_2k_AnimationDblBuf
         private Graphics mainG;
         private int width, height;
         private List<Ball> balls = new List<Ball>();
+        private List<Ring> rings = new List<Ring>();
         private Thread t;
         private bool stop = false;
         private BufferedGraphics bg;
@@ -30,10 +31,18 @@ namespace _2020_03_03_2k_AnimationDblBuf
                 mainG,
                 new Rectangle(0, 0, width, height)
             );
+            Monitor.Enter(balls);
             foreach (var b in balls)
             {
                 b.Update(r);
             }
+            Monitor.Exit(balls);
+            Monitor.Enter(rings);
+            foreach (var rng in rings)
+            {
+                rng.Update(r);
+            }
+            Monitor.Exit(rings);
         }
 
         private void Animate()
@@ -42,6 +51,28 @@ namespace _2020_03_03_2k_AnimationDblBuf
             {
                 Graphics g = bg.Graphics;
                 g.Clear(Color.White);
+                Monitor.Enter(rings);
+                int cnt = rings.Count;
+                for (int i = 0; i < cnt; i++)
+                {
+                    if (!rings[i].IsAlive) rings.Remove(rings[i]);
+                    i--;
+                    cnt--;
+                }
+                foreach (var r in rings)
+                {
+                    Brush br = new SolidBrush(r.RingColor);
+                    g.FillEllipse(br, r.X, r.Y, 2*r.Radius, 2*r.Radius);
+                }
+                Monitor.Exit(rings);
+                Monitor.Enter(balls);
+                cnt = balls.Count;
+                for (int i = 0; i < cnt; i++)
+                {
+                    if (!balls[i].IsAlive) balls.Remove(balls[i]);
+                    i--;
+                    cnt--;
+                }
                 foreach (var b in balls)
                 {
                     Brush br = new SolidBrush(b.BgColor);
@@ -49,7 +80,7 @@ namespace _2020_03_03_2k_AnimationDblBuf
                     Pen p = new Pen(b.FgColor, 2);
                     g.DrawEllipse(p,  b.X, b.Y, b.BallD, b.BallD);
                 }
-
+                Monitor.Exit(balls);
                 try
                 {
                     bg.Render();
@@ -68,14 +99,29 @@ namespace _2020_03_03_2k_AnimationDblBuf
                 t = new Thread(th);
                 t.Start();
             }
-            Ball b = new Ball(new Rectangle(0, 0, width, height));
+            var rect = new Rectangle(0, 0, width, height);
+            Ball b = new Ball(rect);
+            Ring r = new Ring(b.BgColor, rect);
             b.Start();
+            r.Start();
+            Monitor.Enter(balls);
             balls.Add(b);
+            Monitor.Exit(balls);
+            Monitor.Enter(rings);
+            rings.Add(r);
+            Monitor.Exit(rings);
         }
 
         public void Stop()
         {
             stop = true;
+            Monitor.Enter(balls);
+            foreach (var b in balls)
+            {
+                b.Stop();
+            }
+            balls.Clear();
+            Monitor.Exit(balls);
         }
     }
 }
