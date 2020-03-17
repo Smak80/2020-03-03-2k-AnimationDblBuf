@@ -50,8 +50,9 @@ namespace _2020_03_03_2k_AnimationDblBuf
                 Y -= 1;
                 Radius += 1;
                 Thread.Sleep(5);
+                int alpha = Math.Abs((int)((1.0 - (float) Radius / maxRadius) * 255))%255;
                 RingColor = Color.FromArgb(
-                    (int)((1.0 - (float)Radius/maxRadius)*255),
+                    (int)(alpha),
                     RingColor.R,
                     RingColor.G,
                     RingColor.B
